@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (form) => {
     try {
       const response = await axios.post(
-        "https://classmatebe-authentication.onrender.com/auth/signIn",
+        "http://localhost:3001/auth/signIn",
         form
       );
       const token = response.data;

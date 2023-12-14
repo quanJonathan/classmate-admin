@@ -11,9 +11,15 @@ import {
   Typography,
   Unstable_Grid2 as Grid,
 } from "@mui/material";
-import { CompanyCard } from "../../src/sections/companies/company-card";
-import { CompaniesSearch } from "../../src/sections/companies/companies-search";
-import  Layout  from "../layouts/dashboard/layout";
+import { ClassCard } from "../sections/classes/class-card";
+import { ClassesSearch } from "../sections/classes/classes-search";
+import Layout from "../layouts/dashboard/layout";
+import useSWR from "swr";
+import { Helmet } from "react-helmet";
+import Spinner from '.././components/spinner'
+import axios from "axios";
+import FormModal from "../components/modal";
+import { useState } from "react";
 
 const companies = [
   {
@@ -46,8 +52,7 @@ const companies = [
   {
     id: "1efecb2bf6a51def9869ab0f",
     createdAt: "04/04/2019",
-    description:
-      "Lyft is an on-demand transportation company based in San Francisco, California.",
+    description: "Lyft is an on-demand transportation company based in San Francisco, California.",
     logo: "/assets/logos/logo-lyft.png",
     title: "Lyft",
     downloads: "406",
@@ -55,8 +60,7 @@ const companies = [
   {
     id: "1ed68149f65fbc6089b5fd07",
     createdAt: "04/04/2019",
-    description:
-      "GitHub is a web-based hosting service for version control of code using Git.",
+    description: "GitHub is a web-based hosting service for version control of code using Git.",
     logo: "/assets/logos/logo-github.png",
     title: "GitHub",
     downloads: "835",
@@ -72,75 +76,101 @@ const companies = [
   },
 ];
 
-const Page = () => (
-  <Box
-    component="main"
-    sx={{
-      flexGrow: 1,
-      py: 8,
-    }}
-  >
-    <Container maxWidth="xl">
-      <Stack spacing={3}>
-        <Stack direction="row" justifyContent="space-between" spacing={4}>
-          <Stack spacing={1}>
-            <Typography variant="h4">Companies</Typography>
-            <Stack alignItems="center" direction="row" spacing={1}>
-              <Button
-                color="inherit"
-                startIcon={
-                  <SvgIcon fontSize="small">
-                    <ArrowUpOnSquareIcon />
-                  </SvgIcon>
-                }
-              >
-                Import
-              </Button>
-              <Button
-                color="inherit"
-                startIcon={
-                  <SvgIcon fontSize="small">
-                    <ArrowDownOnSquareIcon />
-                  </SvgIcon>
-                }
-              >
-                Export
-              </Button>
-            </Stack>
-          </Stack>
-          <div>
-            <Button
-              startIcon={
-                <SvgIcon fontSize="small">
-                  <PlusIcon />
-                </SvgIcon>
-              }
-              variant="contained"
-            >
-              Add
-            </Button>
-          </div>
-        </Stack>
-        <CompaniesSearch />
-        <Grid container spacing={3}>
-          {companies.map((company) => (
-            <Grid xs={12} md={6} lg={4} key={company.id}>
-              <CompanyCard company={company} />
-            </Grid>
-          ))}
-        </Grid>
+const Page = () => {
+  const fetcher = url => axios.get(url).then(res => res.data)
+  const { data, isLoading, error } = useSWR("http://localhost:3001/class/all", fetcher);
+
+  if(error) return <div>{error}</div>
+  console.log(data)
+
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  return (
+    <>
+      <Helmet>Classes</Helmet>
+      {isLoading ? (
+        <Spinner/>
+      ) : (
         <Box
+          component="main"
           sx={{
-            display: "flex",
-            justifyContent: "center",
+            flexGrow: 1,
+            py: 8,
           }}
         >
-          <Pagination count={3} size="small" />
+          <FormModal isOpen={isModalOpen} onClose={handleCloseModal} />
+          <Container maxWidth="xl">
+            <Stack spacing={3}>
+              <Stack direction="row" justifyContent="space-between" spacing={4}>
+                <Stack spacing={1}>
+                  <Typography variant="h4">Classes</Typography>
+                  <Stack alignItems="center" direction="row" spacing={1}>
+                    <Button
+                      color="inherit"
+                      startIcon={
+                        <SvgIcon fontSize="small">
+                          <ArrowUpOnSquareIcon />
+                        </SvgIcon>
+                      }
+                    >
+                      Import
+                    </Button>
+                    <Button
+                      color="inherit"
+                      startIcon={
+                        <SvgIcon fontSize="small">
+                          <ArrowDownOnSquareIcon />
+                        </SvgIcon>
+                      }
+                    >
+                      Export
+                    </Button>
+                  </Stack>
+                </Stack>
+                <div>
+                  <Button
+                    startIcon={
+                      <SvgIcon fontSize="small">
+                        <PlusIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                    onClick={handleOpenModal}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </Stack>
+              <ClassesSearch />
+              <Grid container spacing={3}>
+                {data.map((classObject) => (
+                  <Grid xs={12} md={6} lg={4} key={classObject.classID}>
+                    <ClassCard classObject={classObject} />
+                  </Grid>
+                ))}
+              </Grid>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Pagination count={3} size="small" />
+              </Box>
+            </Stack>
+          </Container>
         </Box>
-      </Stack>
-    </Container>
-  </Box>
-);
-
+      )}
+    </>
+  );
+};
 
 export default Page;

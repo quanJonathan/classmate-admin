@@ -23,7 +23,7 @@ export const AuthGuard = (props) => {
 
     if (!isAuthenticated) {
       console.log('Not authenticated, redirecting');
-      navigate.navigate({
+      navigate({
         pathname: '/auth/login',
         state: { continueUrl: location.pathname !== '/' ? location.pathname : undefined },
       });

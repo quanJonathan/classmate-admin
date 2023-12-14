@@ -25,6 +25,7 @@ import { CacheProvider } from "@emotion/react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Layout from "./layouts/dashboard/layout";
 import 'simplebar-react/dist/simplebar.min.css';
+import ClassEdit from "./pages/class_edit";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -62,11 +63,15 @@ export const router = createBrowserRouter(
     <Route element={<AuthLayout />}>
       <Route path="/" element={<Layout />}>
         <Route path="" element={<Index />} />
-        <Route path="sign-in" element={<SignIn />} />
         <Route path="*" element={<Error />} />
+        <Route path="/classes" element={<Classes/>}/>
+        <Route path="/class/edit/:id" element={<ClassEdit/>} />
         <Route path="/accounts" element={<Accounts />} />
-        <Route path="/classes" element={<Classes />} />
         <Route path="/settings" element={<Settings />} />
+      </Route>
+
+      <Route path="/auth">
+        <Route path="login" element={<SignIn />} />
       </Route>
     </Route>
   )
