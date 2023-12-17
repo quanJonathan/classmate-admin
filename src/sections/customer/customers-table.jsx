@@ -32,8 +32,11 @@ export const CustomersTable = (props) => {
     selected = []
   } = props;
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
+  console.log(`count=${count}`);
+  console.log(items?.length);
+
+  const selectedSome = (selected?.length > 0) && (selected?.length < items?.length);
+  const selectedAll = (items?.length > 0) && (selected?.length === items?.length);
 
   return (
     <Card>
@@ -62,10 +65,7 @@ export const CustomersTable = (props) => {
                   Email
                 </TableCell>
                 <TableCell>
-                  Location
-                </TableCell>
-                <TableCell>
-                  Phone
+                  Student ID
                 </TableCell>
                 <TableCell>
                   Signed Up
@@ -74,13 +74,15 @@ export const CustomersTable = (props) => {
             </TableHead>
             <TableBody>
               {items.map((customer) => {
-                const isSelected = selected.includes(customer.id);
-                const createdAt = format(customer.createdAt, 'dd/MM/yyyy');
+                console.log(customer)
+                const isSelected = selected.includes(customer?._id);
+                // const createdAt = format(customer?.createdDate, 'dd/MM/yyyy');
+                const createdAt = customer?.createdDate;
 
                 return (
                   <TableRow
                     hover
-                    key={customer.id}
+                    key={customer._id}
                     selected={isSelected}
                   >
                     <TableCell padding="checkbox">
@@ -88,9 +90,9 @@ export const CustomersTable = (props) => {
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(customer.id);
+                            onSelectOne?.(customer._id);
                           } else {
-                            onDeselectOne?.(customer.id);
+                            onDeselectOne?.(customer._id);
                           }
                         }}
                       />
@@ -102,10 +104,11 @@ export const CustomersTable = (props) => {
                         spacing={2}
                       >
                         <Avatar src={customer.avatar}>
-                          {getInitials(customer.name)}
+                          {/* {getInitials(customer.name)} */}
                         </Avatar>
                         <Typography variant="subtitle2">
-                          {customer.name}
+                          {/* {customer.name} */}
+                          {customer.firstName + " " + customer.lastName}
                         </Typography>
                       </Stack>
                     </TableCell>
@@ -113,11 +116,9 @@ export const CustomersTable = (props) => {
                       {customer.email}
                     </TableCell>
                     <TableCell>
-                      {customer.address.city}, {customer.address.state}, {customer.address.country}
+                      {customer._id}
                     </TableCell>
-                    <TableCell>
-                      {customer.phone}
-                    </TableCell>
+                    
                     <TableCell>
                       {createdAt}
                     </TableCell>
