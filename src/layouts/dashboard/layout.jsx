@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom'; // Import the appropriate hook for routing
 import { styled } from '@mui/material/styles';
-import { withAuthGuard } from '../../hocs/with-auth-guard';
 import  {SideNav}  from './side-nav';
 import TopNav from './top-nav';
 

@@ -3,14 +3,7 @@ import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import {
-  Box,
-  Button,
-  Container,
-  Stack,
-  SvgIcon,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
 import { useSelection } from "../hooks/use-selection";
 import { CustomersTable as AccountsTable } from "../sections/customer/customers-table";
 import { CustomersSearch as AccountsSearch } from "../sections/customer/customers-search";
@@ -19,7 +12,7 @@ import Layout from "../layouts/dashboard/layout";
 import useSWR from "swr";
 import Spinner from "../components/spinner";
 import axios from "axios";
-
+import { useUsers } from "../hooks/useAccounts";
 
 const now = new Date();
 
@@ -175,7 +168,7 @@ const useAccounts = (data, page, rowsPerPage) => {
 };
 
 const useAccountIds = (acc) => {
-  if (!acc) acc=[];
+  if (!acc) acc = [];
   console.log(acc);
   return useMemo(() => {
     //console.log(acc.length);
@@ -187,17 +180,11 @@ const Accounts = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const fetcher = url => axios.get(url).then(res => res.data);
-  const { data, isLoading, error } = useSWR("http://localhost:3001/user/all", fetcher);
+  const { users, isLoading, isError } = useUsers()
 
-  //console.log(error);
-  //if (error) return <div>{error}</div>;  
-  const acc = useAccounts(data, page, rowsPerPage);
+  const acc = useAccounts(users, page, rowsPerPage);
   const AccountsIds = useAccountIds(acc);
   const AccountsSelection = useSelection(AccountsIds);
-  
-  console.log(isLoading);
-  
 
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -219,75 +206,77 @@ const Accounts = () => {
 
   return (
     <>
-    {isLoading ? (
-      <Spinner />
-    ) : (
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        py: 8,
-      }}
-    >   
-        <Container maxWidth="xl">
-          <Stack spacing={3}>
-            <Stack direction="row" justifyContent="space-between" spacing={4}>
-              <Stack spacing={1}>
-                <Typography variant="h4">Accounts</Typography>
-                <Stack alignItems="center" direction="row" spacing={1}>
-                  <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowUpOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Import
-                  </Button>
-                  <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowDownOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Export
-                  </Button>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            py: 8,
+          }}
+        >
+          <Container maxWidth="xl">
+            <Stack spacing={3}>
+              <Stack direction="row" justifyContent="space-between" spacing={4}>
+                <Stack spacing={1}>
+                  <Typography variant="h4">Accounts</Typography>
+                  <Stack alignItems="center" direction="row" spacing={1}>
+                    <Button
+                      color="inherit"
+                      startIcon={
+                        <SvgIcon fontSize="small">
+                          <ArrowUpOnSquareIcon />
+                        </SvgIcon>
+                      }
+                    >
+                      Import
+                    </Button>
+                    <Button
+                      color="inherit"
+                      startIcon={
+                        <SvgIcon fontSize="small">
+                          <ArrowDownOnSquareIcon />
+                        </SvgIcon>
+                      }
+                    >
+                      Export
+                    </Button>
+                  </Stack>
                 </Stack>
+                <div>
+                  <Button
+                    startIcon={
+                      <SvgIcon fontSize="small">
+                        <PlusIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                  >
+                    Add
+                  </Button>
+                </div>
               </Stack>
-              <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                >
-                  Add
-                </Button>
-              </div>
+              <AccountsSearch />
+              <AccountsTable
+                count={users?.length}
+                items={acc}
+                onDeselectAll={AccountsSelection.handleDeselectAll}
+                onDeselectOne={AccountsSelection.handleDeselectOne}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                onSelectAll={AccountsSelection.handleSelectAll}
+                onSelectOne={AccountsSelection.handleSelectOne}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                selected={AccountsSelection.selected}
+              />
             </Stack>
-            <AccountsSearch />
-            <AccountsTable
-              count={data?.length}
-              items={acc}
-              onDeselectAll={AccountsSelection.handleDeselectAll}
-              onDeselectOne={AccountsSelection.handleDeselectOne}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={AccountsSelection.handleSelectAll}
-              onSelectOne={AccountsSelection.handleSelectOne}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              selected={AccountsSelection.selected}
-            />
-          </Stack>
-        </Container>
-    </Box>
-                )}</>);
+          </Container>
+        </Box>
+      )}
+    </>
+  );
 };
 
 export default Accounts;

@@ -21,10 +21,17 @@ export const AuthProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
+  //useEffect(() => {
+    // if(!token){
+    //   navigate('/auth/login', {replace: true})
+    // }
+  //},[])
+
   useEffect(() => {
     // Check if the token is expired or not present
     //console.log(JSON.stringify(token));
     //console.log(user);
+
     const isTokenValid = (token1) => {
       let decodedAccessToken = '';
       if (!token1) {
@@ -78,7 +85,7 @@ export const AuthProvider = ({ children }) => {
         fetchData();
       }
     }
-  }, [navigate, setToken, setUser, token, user]);
+  }, [navigate, setToken, setUser, user]);
 
 
   const login = async (form) => {
@@ -100,7 +107,7 @@ export const AuthProvider = ({ children }) => {
         }
         else {
           toast.success("Successfully Login");
-          navigate("/dashboard", { replace: true });
+          navigate("/", { replace: true });
         }
       } else {
         toast.error("Login Failed");

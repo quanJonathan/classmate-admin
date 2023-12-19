@@ -1,12 +1,15 @@
 import PropTypes from "prop-types";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ClockIcon from "@heroicons/react/24/solid/ClockIcon";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Avatar,
   Box,
   Card,
   CardContent,
   Divider,
+  IconButton,
   Menu,
   MenuItem,
   Stack,
@@ -38,10 +41,16 @@ export const ClassCard = (props) => {
     setContextMenuOpen(false);
   };
 
+  const handleDelete = () => {
+    // Handle delete action
+    handleClose();
+    // Add logic for delete action
+  };
+
   const handleViewDetail = () => {
     handleClose();
-    navigate(`/classes/edit/${classObject.classId}`, {replace: true});
-  }
+    navigate(`/classes/edit/${classObject?.classId}`);
+  };
 
   return (
     <div onContextMenu={handleContextMenu} style={{ cursor: "context-menu" }}>
@@ -52,6 +61,21 @@ export const ClassCard = (props) => {
           height: "100%",
         }}
       >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            pr: 1,
+            pt: 1,
+          }}
+        >
+          <IconButton onClick={handleViewDetail} size="small">
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton onClick={handleDelete} size="small">
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Box>
         <CardContent>
           <Box
             sx={{
@@ -63,7 +87,7 @@ export const ClassCard = (props) => {
             <Avatar src="" variant="square" />
           </Box>
           <Typography align="center" gutterBottom variant="h5">
-            {classObject?.name}
+            {classObject?.className}
           </Typography>
           <Typography align="center" variant="body1">
             {classObject?.classId}
@@ -99,7 +123,6 @@ export const ClassCard = (props) => {
         open={isContextMenuOpen}
         onClose={handleClose}
       >
-        {/* Customize the menu items as needed */}
         <MenuItem onClick={handleViewDetail}>View detail</MenuItem>
         <MenuItem onClick={handleClose}>Disable</MenuItem>
         <MenuItem onClick={handleClose}>Delete</MenuItem>

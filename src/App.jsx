@@ -65,7 +65,7 @@ export const router = createBrowserRouter(
         <Route path="" element={<Index />} />
         <Route path="*" element={<Error />} />
         <Route path="/classes" element={<Classes/>}/>
-        <Route path="/class/edit/:id" element={<ClassEdit/>} />
+        <Route path="/classes/edit/:id" element={<ClassEdit/>} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
