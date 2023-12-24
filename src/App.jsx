@@ -42,7 +42,7 @@ const App = (props) => {
     <CacheProvider value={emotionCache}>
       <HelmetProvider>
         <Helmet>
-          <title>Devias Kit</title>
+          <title>CLASSMATE ADMIN</title>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Helmet>
       </HelmetProvider>

@@ -2,6 +2,9 @@ import { useCallback, useMemo, useState } from "react";
 import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
+import ShieldExclamationIcon from "@heroicons/react/24/solid/ShieldExclamationIcon";
+import TrashIcon from "@heroicons/react/24/solid/TrashIcon";
+
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
 import { useSelection } from "../hooks/use-selection";
@@ -13,6 +16,8 @@ import useSWR from "swr";
 import Spinner from "../components/spinner";
 import axios from "axios";
 import { useUsers } from "../hooks/useAccounts";
+import Grid from '@mui/material/Grid'; // Grid version 1
+import AccountFormDialog from "../components/AccountFormDialog";
 
 const now = new Date();
 
@@ -172,7 +177,7 @@ const useAccountIds = (acc) => {
   console.log(acc);
   return useMemo(() => {
     //console.log(acc.length);
-    return acc.map((acc) => acc.id);
+    return acc.map((acc) => acc._id);
   }, [acc]);
 };
 
@@ -184,7 +189,33 @@ const Accounts = () => {
 
   const acc = useAccounts(users, page, rowsPerPage);
   const AccountsIds = useAccountIds(acc);
-  const AccountsSelection = useSelection(AccountsIds);
+  //const AccountsSelection = useSelection(AccountsIds);
+
+  console.log(isLoading);
+  console.log(AccountsIds);
+
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
+  const submitUrl = "http://localhost:3001/user/addAccount";
+
+  const defaultValue = {
+    firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      roles: "",
+      provider: "",
+      address: "",
+      phoneNumber: "",
+      photo: "",
+      state: null,
+  };
+
+  const fields = [
+    {name: 'className', label: 'Class name (required)', type: 'text', inputType: ''},
+    {name: 'members', label: 'Class member(s)', type: 'email', inputType:'textBox'},
+    {name: 'teachers', label: 'Class teacher(s)', type: 'email', inputType: 'textBox'}
+  ]
 
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -216,6 +247,13 @@ const Accounts = () => {
             py: 8,
           }}
         >
+                    <AccountFormDialog
+            defaultValue={defaultValue}
+            isOpen={isModalOpen}
+            handleClose={handleCloseModal}
+            postUrl={submitUrl}
+            fields={fields}
+          />
           <Container maxWidth="xl">
             <Stack spacing={3}>
               <Stack direction="row" justifyContent="space-between" spacing={4}>
@@ -244,7 +282,7 @@ const Accounts = () => {
                     </Button>
                   </Stack>
                 </Stack>
-                <div>
+                {/* <div>
                   <Button
                     startIcon={
                       <SvgIcon fontSize="small">
@@ -255,21 +293,53 @@ const Accounts = () => {
                   >
                     Add
                   </Button>
-                </div>
+                </div> */}
               </Stack>
-              <AccountsSearch />
+              <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between">
+                <AccountsSearch />
+                <Stack direction="row" spacing={1} paddingY='2%'>
+                  <Button item
+                    startIcon={
+                      <SvgIcon fontSize="small">
+                        <PlusIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                    onClick={handleOpenModal}
+                  >
+                    Add
+                  </Button>
+                  <Button item
+                    startIcon={
+                      <SvgIcon fontSize="small">
+                        < TrashIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                  >
+                    Delete
+                  </Button>
+                  <Button item
+                    startIcon={
+                      <SvgIcon fontSize="small">
+                        <ShieldExclamationIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                  >
+                    Ban
+                  </Button>
+
+                </Stack>
+              </Stack>
               <AccountsTable
                 count={users?.length}
                 items={acc}
-                onDeselectAll={AccountsSelection.handleDeselectAll}
-                onDeselectOne={AccountsSelection.handleDeselectOne}
+                accId={AccountsIds}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
-                onSelectAll={AccountsSelection.handleSelectAll}
-                onSelectOne={AccountsSelection.handleSelectOne}
                 page={page}
                 rowsPerPage={rowsPerPage}
-                selected={AccountsSelection.selected}
               />
             </Stack>
           </Container>
