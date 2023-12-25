@@ -4,6 +4,7 @@ import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIc
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
 import ShieldExclamationIcon from "@heroicons/react/24/solid/ShieldExclamationIcon";
 import TrashIcon from "@heroicons/react/24/solid/TrashIcon";
+import { toast } from "react-toastify";
 
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
@@ -197,6 +198,7 @@ const Accounts = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
 
   const submitUrl = "http://localhost:3001/user/addAccount";
+  const banUrl = "http://localhost:3001/user/ban";
 
   const defaultValue = {
     firstName: "",
@@ -234,6 +236,29 @@ const Accounts = () => {
   const handleRowsPerPageChange = useCallback((event) => {
     setRowsPerPage(event.target.value);
   }, []);
+
+  const handleBan = (email, state) => {
+    
+    let curUser = {
+      firstName: "",
+        lastName: "",
+        email: email,
+        password: "",
+        roles: "",
+        provider: "",
+        address: "",
+        phoneNumber: "",
+        photo: "",
+        state: state,
+    };
+    console.log('Form submitted:', curUser);
+    if (!curUser.email) {
+      toast.error('Check for missing infos')
+      console.error('Check for missing infos');
+      return;
+    }
+    axios.post(banUrl, curUser);
+  };
 
   return (
     <>
@@ -298,7 +323,7 @@ const Accounts = () => {
               <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between">
                 <AccountsSearch />
                 <Stack direction="row" spacing={1} paddingY='2%'>
-                  <Button item
+                  <Button 
                     startIcon={
                       <SvgIcon fontSize="small">
                         <PlusIcon />
@@ -309,7 +334,7 @@ const Accounts = () => {
                   >
                     Add
                   </Button>
-                  <Button item
+                  <Button 
                     startIcon={
                       <SvgIcon fontSize="small">
                         < TrashIcon />
@@ -319,7 +344,7 @@ const Accounts = () => {
                   >
                     Delete
                   </Button>
-                  <Button item
+                  <Button 
                     startIcon={
                       <SvgIcon fontSize="small">
                         <ShieldExclamationIcon />
@@ -340,6 +365,7 @@ const Accounts = () => {
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}
                 rowsPerPage={rowsPerPage}
+                handleBan={handleBan}
               />
             </Stack>
           </Container>

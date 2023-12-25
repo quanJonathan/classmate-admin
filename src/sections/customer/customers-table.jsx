@@ -23,7 +23,9 @@ import { ClockIcon } from '@mui/x-date-pickers';
 import PencilSquareIcon from "@heroicons/react/24/solid/PencilSquareIcon";
 import CheckIcon from "@heroicons/react/24/solid/CheckCircleIcon";
 import XMarkIcon from "@heroicons/react/24/solid/XMarkIcon";
+import NoSymbolIcon from "@heroicons/react/24/solid/NoSymbolIcon";
 import ShieldExclamationIcon from "@heroicons/react/24/solid/ShieldExclamationIcon";
+import { userStateEnum } from './userState.enum';
 
 export const CustomersTable = (props) => {
   const {
@@ -34,6 +36,7 @@ export const CustomersTable = (props) => {
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 0,
+    handleBan = () => {}
   } = props;
 
   function stringToColor(string) {
@@ -194,12 +197,14 @@ export const CustomersTable = (props) => {
                     <TableCell
                     >
                       <Button disableRipple
+                      id={customer._id}
                         color="inherit"
                         startIcon={
                           <SvgIcon fontSize="small">
-                            <CheckIcon />
+                            {customer.state === userStateEnum.activated ?<CheckIcon /> : customer.state === userStateEnum.notActivated ? <XMarkIcon/> : <NoSymbolIcon/>}
                           </SvgIcon>
                         }
+                        onClick={() => handleBan(customer.email, customer.state)}
                       >
                       </Button>
                     </TableCell>
