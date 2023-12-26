@@ -4,11 +4,12 @@ export const useSelection = (items = []) => {
   const [selected, setSelected] = useState([]);
 
   useEffect(() => {
-    setSelected([]);
+    // setSelected([]);
   }, [items]);
 
   const handleSelectAll = useCallback(() => {
     setSelected([...items]);
+    //console.log(items)
   }, [items]);
 
   const handleSelectOne = useCallback((item) => {

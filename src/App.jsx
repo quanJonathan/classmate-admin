@@ -26,6 +26,8 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import Layout from "./layouts/dashboard/layout";
 import 'simplebar-react/dist/simplebar.min.css';
 import ClassEdit from "./pages/class_edit";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -49,6 +51,8 @@ const App = (props) => {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          <ToastContainer theme="colored" position="top-center"></ToastContainer>
+
           <RouterProvider router={router} />
         </ThemeProvider>
       </LocalizationProvider>

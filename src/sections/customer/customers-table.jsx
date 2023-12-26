@@ -26,39 +26,50 @@ import XMarkIcon from "@heroicons/react/24/solid/XMarkIcon";
 import NoSymbolIcon from "@heroicons/react/24/solid/NoSymbolIcon";
 import ShieldExclamationIcon from "@heroicons/react/24/solid/ShieldExclamationIcon";
 import { userStateEnum } from './userState.enum';
+import { useState } from 'react';
+import AccountEditFormDialog from '../../components/AccountEditFormDialog';
+import axios, { HttpStatusCode } from "axios";
+import { toast } from "react-toastify";
 
 export const CustomersTable = (props) => {
   const {
     count = 0,
     items = [],
     accId,
+    accEmail,
     onPageChange = () => { },
     onRowsPerPageChange,
+    onDeselectAll,
+    onSelectAll,
+    onSelectOne,
+    onDeselectOne,
+    selected,
     page = 0,
     rowsPerPage = 0,
-    handleBan = () => {}
+    handleBan = () => {},
   } = props;
+
 
   function stringToColor(string) {
     let hash = 0;
     let i;
-  
+
     /* eslint-disable no-bitwise */
     for (i = 0; i < string.length; i += 1) {
       hash = string.charCodeAt(i) + ((hash << 5) - hash);
     }
-  
+
     let color = '#';
-  
+
     for (i = 0; i < 3; i += 1) {
       const value = (hash >> (i * 8)) & 0xff;
       color += `00${value.toString(16)}`.slice(-2);
     }
     /* eslint-enable no-bitwise */
-  
+
     return color;
   }
-  
+
   function stringAvatar(name) {
     name = name.toUpperCase()
     return {
@@ -69,18 +80,41 @@ export const CustomersTable = (props) => {
     };
   }
 
-  const accSelect = useSelection(accId);
-  const onDeselectAll = accSelect.handleDeselectAll;
-  const onDeselectOne = accSelect.handleDeselectOne;
-  const onSelectAll = accSelect.handleSelectAll;
-  const onSelectOne = accSelect.handleSelectOne;
-  const selected = accSelect.selected;
-
-  console.log(`count=${count}`);
-  console.log(items?.length);
+  //console.log(`count=${count}`);
+  //console.log(items);
 
   const selectedSome = (selected?.length > 0) && (selected?.length < items?.length);
   const selectedAll = (items?.length > 0) && (selected?.length === items?.length);
+
+  const editUrl = "http://localhost:3001/user/update";
+
+  let defaultValue = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    roles: "",
+    provider: "",
+    address: "",
+    phoneNumber: "",
+    photo: "",
+    state: null,
+  };
+
+  const fields = [
+    { name: 'className', label: 'Class name (required)', type: 'text', inputType: '' },
+    { name: 'members', label: 'Class member(s)', type: 'email', inputType: 'textBox' },
+    { name: 'teachers', label: 'Class teacher(s)', type: 'email', inputType: 'textBox' }
+  ]
+
+  const [isEditModalOpen, setEditModalOpen] = useState(-1);
+  const handleOpenEditModal = (id) => {
+    setEditModalOpen(id);
+  };
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+  };
+
 
   return (
     <Card>
@@ -124,12 +158,12 @@ export const CustomersTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {items.map((customer) => {
-                console.log(customer._id)
-                console.log(selected)
-                const isSelected = selected.includes(customer?._id);
-                // const createdAt = format(customer?.createdDate, 'dd/MM/yyyy');
-                const createdAt = customer?.createdDate;
+              {items.map((customer, index) => {
+                //console.log(customer._id)
+                //console.log(selected)
+                const isSelected = selected.includes(customer?.email);
+                const createdAt = format(new Date(customer?.createdDate), 'dd/MM/yyyy HH:mm:ss');
+                //const createdAt = customer?.createdDate;
 
                 return (
                   <TableRow
@@ -142,9 +176,9 @@ export const CustomersTable = (props) => {
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(customer._id);
+                            onSelectOne?.(customer.email);
                           } else {
-                            onDeselectOne?.(customer._id);
+                            onDeselectOne?.(customer.email);
                           }
                         }}
                       />
@@ -156,13 +190,13 @@ export const CustomersTable = (props) => {
                         spacing={2}
                       >
                         <Avatar {...stringAvatar(customer ? `${customer.lastName} ${customer.firstName}` : 'Default')}
-                          // size="large"
-                          // edge="end"
-                          // aria-label="account of current user"
-                          // aria-controls={menuId}
-                          // aria-haspopup="true"
-                          // onClick={handleProfileMenuOpen}
-                          // color="inherit"
+                        // size="large"
+                        // edge="end"
+                        // aria-label="account of current user"
+                        // aria-controls={menuId}
+                        // aria-haspopup="true"
+                        // onClick={handleProfileMenuOpen}
+                        // color="inherit"
                         >
                           {/* <AccountCircle sx={{ width: "40px", height: "40px" }} /> */}
                         </Avatar>
@@ -182,26 +216,39 @@ export const CustomersTable = (props) => {
                     <TableCell>
                       {createdAt}
                     </TableCell>
-                    <TableCell
+                    <TableCell id={customer._id}
                     >
                       <Button
                         color="inherit"
+                        id={customer._id}
+
                         startIcon={
                           <SvgIcon fontSize="small">
                             < PencilSquareIcon />
                           </SvgIcon>
                         }
+                        onClick={() => handleOpenEditModal(customer._id)}
                       >
+
+
                       </Button>
+                      <AccountEditFormDialog
+                       id={customer._id}
+                        defaultValue={customer}
+                        isOpen={isEditModalOpen}
+                        handleClose={handleCloseEditModal}
+                        postUrl={editUrl}
+                        fields={fields}
+                      />
                     </TableCell>
                     <TableCell
                     >
                       <Button disableRipple
-                      id={customer._id}
+                        id={customer._id}
                         color="inherit"
                         startIcon={
                           <SvgIcon fontSize="small">
-                            {customer.state === userStateEnum.activated ?<CheckIcon /> : customer.state === userStateEnum.notActivated ? <XMarkIcon/> : <NoSymbolIcon/>}
+                            {customer.state === userStateEnum.activated ? <CheckIcon /> : customer.state === userStateEnum.notActivated ? <XMarkIcon /> : <NoSymbolIcon />}
                           </SvgIcon>
                         }
                         onClick={() => handleBan(customer.email, customer.state)}

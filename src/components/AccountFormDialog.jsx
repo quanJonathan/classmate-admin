@@ -6,10 +6,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import axios from 'axios';
+import axios, { HttpStatusCode } from 'axios';
 import { toast } from "react-toastify";
 
-const AccountFormDialog = ({ fields, defaultValue, isOpen, postUrl, title, handleClose }) => {
+const AccountFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, title, handleClose}) => {
   const [formData, setFormData] = useState(defaultValue);
 
   const handleInputChange = (e) => {
@@ -20,7 +20,9 @@ const AccountFormDialog = ({ fields, defaultValue, isOpen, postUrl, title, handl
     }));
   };
 
-  const handleFormSubmit = () => {
+  //console.log(defaultValue)
+
+  const handleFormSubmit = async () => {
     // Add your form submission logic here
     console.log('Form submitted:', formData);
     if (!formData.lastName || !formData.firstName || !formData.email || !formData.password) {
@@ -28,18 +30,29 @@ const AccountFormDialog = ({ fields, defaultValue, isOpen, postUrl, title, handl
       console.error('Check for missing infos');
       return;
     }
-    axios.post(postUrl, formData)
+    await axios.post(postUrl, formData)
+    .then((res) => {
+      console.log(res)
+      if (res.status === HttpStatusCode.Created)
+        toast.success('Created successfully: ' + res.data.email);
+      else {
+        toast.error('User has existed!')
+      }
+    })
+    .catch((e) => {     
+      toast.error('User has existed!')
+    });
     handleCloseFull();
   };
 
   const handleCloseFull = () => {
-    setFormData(defaultValue)
+    //setFormData(defaultValue)
     handleClose();
   }
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={handleCloseFull}>
+      <Dialog open={id ? isOpen === id : isOpen} onClose={handleCloseFull}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -93,7 +106,7 @@ const AccountFormDialog = ({ fields, defaultValue, isOpen, postUrl, title, handl
             name="password"
             label="Password"
             type="password"
-            minlength="6"
+            minLength="6"
             fullWidth
             value={formData?.password}
             onChange={handleInputChange}

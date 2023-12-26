@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
@@ -15,10 +15,22 @@ import { applyPagination } from "../utils/apply-pagination";
 import Layout from "../layouts/dashboard/layout";
 import useSWR from "swr";
 import Spinner from "../components/spinner";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 import { useUsers } from "../hooks/useAccounts";
 import Grid from '@mui/material/Grid'; // Grid version 1
 import AccountFormDialog from "../components/AccountFormDialog";
+import { userStateEnum } from "../sections/customer/userState.enum";
+import { trackPromise, usePromiseTracker } from "react-promise-tracker";
+
+const LoadingIndicator = props => {
+  const { promiseInProgress } = usePromiseTracker();
+  
+     return (
+      promiseInProgress && 
+      <Spinner/>
+    );  
+  };
+
 
 const now = new Date();
 
@@ -166,19 +178,28 @@ const now = new Date();
 // ];
 
 const useAccounts = (data, page, rowsPerPage) => {
-  console.log(data);
+  //console.log(data);
   return useMemo(() => {
-    console.log(data);
+    //console.log(data);
     return applyPagination(data, page, rowsPerPage);
   }, [page, rowsPerPage, data]);
 };
 
 const useAccountIds = (acc) => {
   if (!acc) acc = [];
-  console.log(acc);
+  //console.log(acc);
   return useMemo(() => {
     //console.log(acc.length);
     return acc.map((acc) => acc._id);
+  }, [acc]);
+};
+
+const useAccountEmails = (acc) => {
+  if (!acc) acc = [];
+  //console.log(acc);
+  return useMemo(() => {
+    //console.log(acc.length);
+    return acc.map((acc) => acc.email);
   }, [acc]);
 };
 
@@ -186,37 +207,43 @@ const Accounts = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const { users, isLoading, isError } = useUsers()
+  const { users, isLoading, isError } = useUsers();
 
   const acc = useAccounts(users, page, rowsPerPage);
   const AccountsIds = useAccountIds(acc);
+  const AccountsEmails = useAccountEmails(acc);
   //const AccountsSelection = useSelection(AccountsIds);
+  const accSelect = useSelection(AccountsEmails);
+  const onDeselectAll = accSelect.handleDeselectAll;
+  const onDeselectOne = accSelect.handleDeselectOne;
+  const onSelectAll = accSelect.handleSelectAll;
+  const onSelectOne = accSelect.handleSelectOne;
+  const selected = accSelect.selected;
 
-  console.log(isLoading);
-  console.log(AccountsIds);
-
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  //console.log(isLoading);
+  //console.log(AccountsIds);
 
   const submitUrl = "http://localhost:3001/user/addAccount";
   const banUrl = "http://localhost:3001/user/ban";
+  const removeUrl = "http://localhost:3001/user/remove";
 
   const defaultValue = {
     firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      roles: "",
-      provider: "",
-      address: "",
-      phoneNumber: "",
-      photo: "",
-      state: null,
+    lastName: "",
+    email: "",
+    password: "",
+    roles: "",
+    provider: "",
+    address: "",
+    phoneNumber: "",
+    photo: "",
+    state: null,
   };
 
   const fields = [
-    {name: 'className', label: 'Class name (required)', type: 'text', inputType: ''},
-    {name: 'members', label: 'Class member(s)', type: 'email', inputType:'textBox'},
-    {name: 'teachers', label: 'Class teacher(s)', type: 'email', inputType: 'textBox'}
+    { name: 'className', label: 'Class name (required)', type: 'text', inputType: '' },
+    { name: 'members', label: 'Class member(s)', type: 'email', inputType: 'textBox' },
+    { name: 'teachers', label: 'Class teacher(s)', type: 'email', inputType: 'textBox' }
   ]
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -237,10 +264,38 @@ const Accounts = () => {
     setRowsPerPage(event.target.value);
   }, []);
 
-  const handleBan = (email, state) => {
     
-    let curUser = {
-      firstName: "",
+  const handleRemoveMany = async () => {
+    const ids = []
+    selected.forEach(element => {
+      const found = users.find(user => {return user.email === element})
+      //console.log(found)
+      ids.push(found._id)
+      let id = found._id;
+      console.log('Form submitted:', id);
+      
+      axios.post(removeUrl, {'id': id}).then((res) => {
+        if (res.status === HttpStatusCode.Ok)
+          toast.success('Remove ' + found.email + ' successfully!')
+        else
+          toast.error('Cannot remove!')
+      })
+    });
+    console.log(ids);
+    onDeselectAll?.()
+  };
+
+  const handleBanMany = async () => {
+    const ids = []
+    selected.forEach(email => {
+      const found = users.find(user => {return user.email === email})
+      //console.log(found)
+      ids.push(found.state)
+      let state = found.state;
+      console.log('Form submitted:', state);
+
+      let curUser = {
+        firstName: "",
         lastName: "",
         email: email,
         password: "",
@@ -250,6 +305,30 @@ const Accounts = () => {
         phoneNumber: "",
         photo: "",
         state: state,
+      };
+      
+      axios.post(banUrl, curUser).then((res) => {
+        if (res.status === HttpStatusCode.Ok)
+          toast.success((curUser.state === userStateEnum.banned ? 'Unbanned ' : 'Banned ') + curUser.email + ' successfully!')
+        else
+          toast.error('Cannot ban!')
+      })
+    });
+    console.log(ids);
+  };
+
+  const handleBan = async (email, state) => {
+    let curUser = {
+      firstName: "",
+      lastName: "",
+      email: email,
+      password: "",
+      roles: "",
+      provider: "",
+      address: "",
+      phoneNumber: "",
+      photo: "",
+      state: state,
     };
     console.log('Form submitted:', curUser);
     if (!curUser.email) {
@@ -257,7 +336,12 @@ const Accounts = () => {
       console.error('Check for missing infos');
       return;
     }
-    axios.post(banUrl, curUser);
+    await axios.post(banUrl, curUser).then((res) => {
+      if (res.status === HttpStatusCode.Ok)
+        toast.success((curUser.state === userStateEnum.banned ? 'Unbanned ' : 'Banned ') + curUser.email + ' successfully!')
+      else
+        toast.error('Cannot ban!')
+    })
   };
 
   return (
@@ -272,13 +356,15 @@ const Accounts = () => {
             py: 8,
           }}
         >
-                    <AccountFormDialog
+          <LoadingIndicator/>
+          <AccountFormDialog
             defaultValue={defaultValue}
             isOpen={isModalOpen}
             handleClose={handleCloseModal}
             postUrl={submitUrl}
             fields={fields}
           />
+          
           <Container maxWidth="xl">
             <Stack spacing={3}>
               <Stack direction="row" justifyContent="space-between" spacing={4}>
@@ -323,7 +409,7 @@ const Accounts = () => {
               <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between">
                 <AccountsSearch />
                 <Stack direction="row" spacing={1} paddingY='2%'>
-                  <Button 
+                  <Button
                     startIcon={
                       <SvgIcon fontSize="small">
                         <PlusIcon />
@@ -334,23 +420,25 @@ const Accounts = () => {
                   >
                     Add
                   </Button>
-                  <Button 
+                  <Button
                     startIcon={
                       <SvgIcon fontSize="small">
                         < TrashIcon />
                       </SvgIcon>
                     }
                     variant="contained"
+                    onClick={handleRemoveMany}
                   >
                     Delete
                   </Button>
-                  <Button 
+                  <Button
                     startIcon={
                       <SvgIcon fontSize="small">
                         <ShieldExclamationIcon />
                       </SvgIcon>
                     }
                     variant="contained"
+                    onClick={handleBanMany}
                   >
                     Ban
                   </Button>
@@ -361,8 +449,14 @@ const Accounts = () => {
                 count={users?.length}
                 items={acc}
                 accId={AccountsIds}
+                accEmail={AccountsEmails}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
+                onDeselectAll={onDeselectAll}
+                onSelectAll={onSelectAll}
+                onSelectOne={onSelectOne}
+                onDeselectOne={onDeselectOne}
+                selected={selected}
                 page={page}
                 rowsPerPage={rowsPerPage}
                 handleBan={handleBan}
