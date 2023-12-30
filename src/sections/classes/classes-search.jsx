@@ -8,7 +8,7 @@ export const ClassesSearch =  ({handleItemChange}) => {
     handleItemChange(keyword);
   };
   return (
-  <Card sx={{ p: 2, width: {md: "200%"}}}>
+  <Card sx={{ p: 2, }}>
     <OutlinedInput
       defaultValue=""
       onChange={handleInputChange}

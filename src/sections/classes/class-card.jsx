@@ -143,9 +143,9 @@ export const ClassCard = (props) => {
             <SvgIcon color="action" fontSize="small">
               <ClockIcon />
             </SvgIcon>
-            <Typography color="text.secondary" display="inline" variant="body2">
+            {/* <Typography color="text.secondary" display="inline" variant="body2">
               Updated 2hr ago
-            </Typography>
+            </Typography> */}
           </Stack>
           <Stack alignItems="center" direction="row" spacing={1}>
             <Typography color="text.secondary" display="inline" variant="body2">

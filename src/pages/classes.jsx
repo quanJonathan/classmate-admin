@@ -10,7 +10,10 @@ import {
   SvgIcon,
   Typography,
   Unstable_Grid2 as Grid,
-  TablePagination
+  TablePagination,
+  Select, MenuItem,
+  FormControl, InputLabel,
+  FormHelperText
 } from "@mui/material";
 import { ClassCard } from "../sections/classes/class-card";
 import { ClassesSearch } from "../sections/classes/classes-search";
@@ -24,7 +27,7 @@ import FormDialog from "../components/FormDialog";
 import { applyPagination } from "../utils/apply-pagination";
 import { useAllClasses } from "../hooks/useAllClasses";
 
-const useClasses = (data, page, rowsPerPage, keyword) => {
+const useClasses = (data, page, rowsPerPage, keyword, sort) => {
   //console.log(data);
   keyword = keyword.trim().toLowerCase();
   if (keyword) {
@@ -38,6 +41,7 @@ const useClasses = (data, page, rowsPerPage, keyword) => {
     console.log(data);
     return applyPagination(data, page, rowsPerPage);
   }, [page, rowsPerPage, data, keyword]);
+
 };
 
 const Page = () => {
@@ -46,12 +50,32 @@ const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(4);
   const [searchKeyword, setSearchKeyword] = useState('');
-  const { dt, isLoading, error } = useAllClasses()
+  const [sort, setSort] = useState(0);
+  const { dt, isLoading, error } = useAllClasses();
 
   console.log(dt)
-  const data = useClasses(dt, page, rowsPerPage, searchKeyword);
+
+  const data = useClasses(
+    sort == 1 ?
+      [...dt].sort((a, b) => {
+        console.log(a.className)
+        return a.className > b.className ? -1 : 1
+      })
+    : sort == 2 ?
+    [...dt].sort((a, b) => {
+      return a.className < b.className ? -1 : 1
+    })
+    : sort == 3 ?
+    [...dt].sort((a, b) => {
+      return b.members.length - a.members.length
+    })
+    : sort == 4 ?
+    [...dt].sort((a, b) => {
+      return a.members.length - b.members.length
+    })
+    : dt, page, rowsPerPage, searchKeyword);
   console.log(data)
-  
+
   const onPageChange = useCallback((event, value) => {
     setPage(value);
   }, []);
@@ -74,9 +98,9 @@ const Page = () => {
   };
 
   const fields = [
-    {name: 'className', label: 'Class name (required)', type: 'text', inputType: ''},
-    {name: 'members', label: 'Class member(s)', type: 'email', inputType:'textBox'},
-    {name: 'teachers', label: 'Class teacher(s)', type: 'email', inputType: 'textBox'}
+    { name: 'className', label: 'Class name (required)', type: 'text', inputType: '' },
+    { name: 'members', label: 'Class member(s)', type: 'email', inputType: 'textBox' },
+    { name: 'teachers', label: 'Class teacher(s)', type: 'email', inputType: 'textBox' }
   ]
 
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -92,18 +116,24 @@ const Page = () => {
   const handleItemChange = (kw) => {
     if (!kw) {
       setVisible(false)
-      setRowsPerPage(3);
+      setRowsPerPage(4);
       setPage(0)
     }
     else {
-    console.log(kw);
-    setRowsPerPage(1000);
-    setPage(0)
-    setVisible(true)
+      console.log(kw);
+      setRowsPerPage(1000);
+      setPage(0)
+      setVisible(true)
     }
-    
+    setSort(0)
+
     setSearchKeyword(kw);
 
+  };
+
+  const handleSortChange = (e) => {
+    const mode = e.target.value;
+    setSort(mode)
   };
 
   return (
@@ -167,11 +197,43 @@ const Page = () => {
                     Add
                   </Button>
                 </div>
+
               </Stack>
-              <ClassesSearch handleItemChange={handleItemChange} />
+              <Grid container sx={{ alignItems: 'center' }}>
+                <Grid xs={9}>
+                  <ClassesSearch handleItemChange={handleItemChange} />
+                </Grid>
+                <Grid xs={3}>
+
+                  <FormControl
+                    sx={{
+                      width: 200,
+                      mt: "7%"
+
+                    }}>
+                    <InputLabel id="simple-select-label">No Sorting</InputLabel>
+                    <Select
+                      sx={{
+                        width: 250,
+                        height: 50,
+
+                      }}
+                      value={sort}
+                      onChange={handleSortChange}
+                    >
+                      <MenuItem value={0}>No Sorting</MenuItem>
+                      <MenuItem value={1}>Decreasing Name</MenuItem>
+                      <MenuItem value={2}>Increasing Name</MenuItem>
+                      <MenuItem value={3}>Decreasing Members</MenuItem>
+                      <MenuItem value={4}>Increasing Members</MenuItem>
+                    </Select>
+                    <FormHelperText>Select a mode</FormHelperText>
+                  </FormControl></Grid>
+              </Grid>
+
               <Grid container spacing={3}>
                 {data?.map((classObject) => (
-                  <Grid xs={12} md={6} lg={4} key={classObject._id}>
+                  <Grid xs={12} md={6} key={classObject._id}>
                     <ClassCard classObject={classObject} />
                   </Grid>
                 ))}
@@ -184,16 +246,16 @@ const Page = () => {
               >
                 {/* <Pagination count={3} size="small" /> */}
                 <TablePagination
-          disabled={rowsPerPage == 1000}
-          component="div"
-          count={!searchKeyword ? dt?.length : data?.length}
-          onPageChange={onPageChange}
-          onRowsPerPageChange={onRowsPerPageChange
-          }
-          page={page}
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[4, 5, 10, 25, 1000]}
-        />
+                  disabled={rowsPerPage == 1000}
+                  component="div"
+                  count={!searchKeyword ? dt?.length : data?.length}
+                  onPageChange={onPageChange}
+                  onRowsPerPageChange={onRowsPerPageChange
+                  }
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  rowsPerPageOptions={[4, 5, 10, 25, 1000]}
+                />
               </Box>
             </Stack>
           </Container>
