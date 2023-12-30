@@ -25,7 +25,7 @@ const AccountFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, title, h
   const handleFormSubmit = async () => {
     // Add your form submission logic here
     console.log('Form submitted:', formData);
-    if (!formData.lastName || !formData.firstName || !formData.email || !formData.password) {
+    if (!formData.lastName || !formData.firstName || (!formData.email && !formData.studentId) || !formData.password) {
       toast.error('Check for missing infos')
       console.error('Check for missing infos');
       return;
@@ -87,7 +87,17 @@ const AccountFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, title, h
               />
             </Grid>
           </Grid>
-
+          <TextField
+            required
+            margin="dense"
+            id="studentId"
+            name="studentId"
+            label="Student ID"
+            type="text"
+            fullWidth
+            value={formData?.studentId}
+            onChange={handleInputChange}
+          />
           <TextField
             required
             margin="dense"

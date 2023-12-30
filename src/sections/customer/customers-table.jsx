@@ -49,6 +49,8 @@ export const CustomersTable = (props) => {
     handleBan = () => {},
   } = props;
 
+  const [visible, setVisible] = useState(false);
+
 
   function stringToColor(string) {
     let hash = 0;
@@ -99,6 +101,7 @@ export const CustomersTable = (props) => {
     phoneNumber: "",
     photo: "",
     state: null,
+    studentId: ''
   };
 
   const fields = [
@@ -161,7 +164,7 @@ export const CustomersTable = (props) => {
               {items.map((customer, index) => {
                 //console.log(customer._id)
                 //console.log(selected)
-                const isSelected = selected.includes(customer?.email);
+                const isSelected = selected.includes(customer?._id);
                 const createdAt = format(new Date(customer?.createdDate), 'dd/MM/yyyy HH:mm:ss');
                 //const createdAt = customer?.createdDate;
 
@@ -176,9 +179,9 @@ export const CustomersTable = (props) => {
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(customer.email);
+                            onSelectOne?.(customer._id);
                           } else {
-                            onDeselectOne?.(customer.email);
+                            onDeselectOne?.(customer._id);
                           }
                         }}
                       />
@@ -189,7 +192,7 @@ export const CustomersTable = (props) => {
                         direction="row"
                         spacing={2}
                       >
-                        <Avatar {...stringAvatar(customer ? `${customer.lastName} ${customer.firstName}` : 'Default')}
+                        <Avatar {...stringAvatar(customer ? `${customer.lastName} ${customer.firstName}` : 'Default Name2')}
                         // size="large"
                         // edge="end"
                         // aria-label="account of current user"
@@ -210,7 +213,7 @@ export const CustomersTable = (props) => {
                       {customer.email}
                     </TableCell>
                     <TableCell>
-                      {customer._id}
+                      {customer.studentId}
                     </TableCell>
 
                     <TableCell>
@@ -251,7 +254,7 @@ export const CustomersTable = (props) => {
                             {customer.state === userStateEnum.activated ? <CheckIcon /> : customer.state === userStateEnum.notActivated ? <XMarkIcon /> : <NoSymbolIcon />}
                           </SvgIcon>
                         }
-                        onClick={() => handleBan(customer.email, customer.state)}
+                        onClick={() => handleBan(customer._id, customer.state)}
                       >
                       </Button>
                     </TableCell>
@@ -264,14 +267,18 @@ export const CustomersTable = (props) => {
       </Scrollbar>
       <Stack direction='row' justifyContent='space-between' alignItems='center'>
         <Typography textAlign='center' visibility={selected?.length > 0 ? 'visible' : 'hidden'} variant='body2' marginLeft='2%' fontWeight='600'>Selecting {selected?.length} accounts</Typography>
+        {visible && <Typography textAlign='center' variant='body2' marginLeft='2%' fontWeight='600'>Showing {selected?.length} results</Typography>}
         <TablePagination
+          disabled={rowsPerPage == 1000}
           component="div"
           count={count}
           onPageChange={onPageChange}
-          onRowsPerPageChange={onRowsPerPageChange}
+          onRowsPerPageChange={
+            onRowsPerPageChange
+          }
           page={page}
           rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[5, 10, 25, 1000]}
         />
       </Stack>
 

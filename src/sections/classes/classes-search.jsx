@@ -1,10 +1,17 @@
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import { Card, InputAdornment, OutlinedInput, SvgIcon } from '@mui/material';
 
-export const ClassesSearch = () => (
-  <Card sx={{ p: 2 }}>
+export const ClassesSearch =  ({handleItemChange}) => {
+  const handleInputChange = (e) => {
+    const keyword = e.target.value;
+
+    handleItemChange(keyword);
+  };
+  return (
+  <Card sx={{ p: 2, width: {md: "200%"}}}>
     <OutlinedInput
       defaultValue=""
+      onChange={handleInputChange}
       fullWidth
       placeholder="Search classes"
       startAdornment={(
@@ -17,7 +24,6 @@ export const ClassesSearch = () => (
           </SvgIcon>
         </InputAdornment>
       )}
-      sx={{ maxWidth: 500 }}
     />
   </Card>
-);
+)};

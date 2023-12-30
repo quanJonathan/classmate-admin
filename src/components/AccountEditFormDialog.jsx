@@ -22,6 +22,17 @@ import { toast } from "react-toastify";
 
 const AccountEditFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, title, handleClose }) => {
   const [formData, setFormData] = useState(defaultValue);
+  const [mssv, setMssv] = useState(formData.studentId != null);
+  const [email, setEmail] = useState(formData.email != null);
+  const [submit, setSubmit] = useState(false);
+
+  const handleOpenMssv = (e) => {
+    setMssv(false);
+  };
+
+  const handleOpenEmail = (e) => {
+    setEmail(false);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,7 +47,12 @@ const AccountEditFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, titl
   const handleFormSubmit = async () => {
     // Add your form submission logic here
     console.log('Form submitted:', formData);
-    if (!formData.lastName || !formData.firstName || !formData.email) {
+    if (!formData.email && !formData.studentId) {
+      toast.error('Email or Student ID must be provided.')
+      console.error('Email or Student ID must be provided.');
+      return;
+    }
+    else if (!formData.lastName || !formData.firstName) {
       toast.error('Check for infos')
       console.error('Check for missing infos');
       return;
@@ -99,7 +115,19 @@ const AccountEditFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, titl
           <DialogContentText>
             Please fill out the form below:
           </DialogContentText>
+          <TextField
+            disabled
+            margin="dense"
+            id="id"
+            name="id"
+            label="Account ID"
+            type="text"
+            fullWidth
+            value={formData?._id}
+            onChange={handleInputChange}
+          />
           <Grid container spacing={1}>
+
             <Grid item xs={12} lg={6}>
               <TextField
                 autoFocus
@@ -130,7 +158,7 @@ const AccountEditFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, titl
           </Grid>
 
           <TextField
-            disabled
+            disabled={email}
             margin="dense"
             id="email"
             name="email"
@@ -139,6 +167,20 @@ const AccountEditFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, titl
             fullWidth
             value={formData?.email}
             onChange={handleInputChange}
+            onDoubleClick={handleOpenEmail}
+          />
+          <TextField
+          disabled={mssv}
+            required
+            margin="dense"
+            id="studentId"
+            name="studentId"
+            label="Student ID"
+            type="text"
+            fullWidth
+            value={formData?.studentId}
+            onChange={handleInputChange}
+            onDoubleClick={handleOpenMssv}
           />
           <FormControl fullWidth required variant="outlined" sx={{
             marginTop: "5px", marginBottom: "5px"

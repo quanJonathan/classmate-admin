@@ -52,6 +52,37 @@ export const ClassCard = (props) => {
     navigate(`/classes/edit/${classObject?.classId}`);
   };
 
+  function stringToColor(string) {
+    string = string.toUpperCase()
+
+    let hash = 0;
+    let i;
+
+    /* eslint-disable no-bitwise */
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    let color = '#';
+
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    /* eslint-enable no-bitwise */
+
+    return color;
+  }
+
+  function stringAvatar(name) {
+    name = name.toUpperCase()
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+    };
+  }
+
   return (
     <div onContextMenu={handleContextMenu} style={{ cursor: "context-menu" }}>
       <Card
@@ -59,6 +90,7 @@ export const ClassCard = (props) => {
           display: "flex",
           flexDirection: "column",
           height: "100%",
+          bgcolor: stringToColor(classObject?.className)
         }}
       >
         <Box
@@ -67,6 +99,10 @@ export const ClassCard = (props) => {
             justifyContent: "flex-end",
             pr: 1,
             pt: 1,
+            bgcolor: 'white',
+            margin: '3% 2.5% 0px 2.5%',
+            borderTopLeftRadius: '10px' ,
+            borderTopRightRadius: '10px' 
           }}
         >
           <IconButton onClick={handleViewDetail} size="small">
@@ -76,7 +112,7 @@ export const ClassCard = (props) => {
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Box>
-        <CardContent>
+        <CardContent sx={{width: '95%', alignSelf: 'center', bgcolor: 'white'}}>
           <Box
             sx={{
               display: "flex",
@@ -94,13 +130,14 @@ export const ClassCard = (props) => {
           </Typography>
         </CardContent>
         <Box sx={{ flexGrow: 1 }} />
-        <Divider />
+        {/* <Divider /> */}
         <Stack
           alignItems="center"
           direction="row"
           justifyContent="space-between"
           spacing={2}
-          sx={{ p: 2 }}
+          sx={{ p: 2, bgcolor: 'white', width: '95%', alignSelf: 'center', marginBottom: '3%', 
+          borderBottomLeftRadius: '10px' , borderBottomRightRadius: '10px' }}
         >
           <Stack alignItems="center" direction="row" spacing={1}>
             <SvgIcon color="action" fontSize="small">

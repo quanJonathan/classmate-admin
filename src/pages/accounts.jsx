@@ -7,10 +7,10 @@ import TrashIcon from "@heroicons/react/24/solid/TrashIcon";
 import { toast } from "react-toastify";
 
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, SvgIcon, Typography, keyframes } from "@mui/material";
 import { useSelection } from "../hooks/use-selection";
 import { CustomersTable as AccountsTable } from "../sections/customer/customers-table";
-import { CustomersSearch as AccountsSearch } from "../sections/customer/customers-search";
+import { AccountsSearch } from "../sections/customer/customers-search";
 import { applyPagination } from "../utils/apply-pagination";
 import Layout from "../layouts/dashboard/layout";
 import useSWR from "swr";
@@ -177,12 +177,20 @@ const now = new Date();
 //   },
 // ];
 
-const useAccounts = (data, page, rowsPerPage) => {
+const useAccounts = (data, page, rowsPerPage, keyword) => {
   //console.log(data);
+  keyword = keyword.trim().toLowerCase();
+  if (keyword) {
+    const data2 = data.filter((user) => user.lastName.toLowerCase().includes(keyword) || user.firstName.toLowerCase().includes(keyword))
+    return useMemo(() => {
+      console.log(data2);
+      return applyPagination(data2, page, rowsPerPage);
+    }, [page, rowsPerPage, data2, keyword]);
+  }
   return useMemo(() => {
     //console.log(data);
     return applyPagination(data, page, rowsPerPage);
-  }, [page, rowsPerPage, data]);
+  }, [page, rowsPerPage, data, keyword]);
 };
 
 const useAccountIds = (acc) => {
@@ -206,14 +214,15 @@ const useAccountEmails = (acc) => {
 const Accounts = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const { users, isLoading, isError } = useUsers();
 
-  const acc = useAccounts(users, page, rowsPerPage);
+  const acc = useAccounts(users, page, rowsPerPage, searchKeyword);
   const AccountsIds = useAccountIds(acc);
   const AccountsEmails = useAccountEmails(acc);
   //const AccountsSelection = useSelection(AccountsIds);
-  const accSelect = useSelection(AccountsEmails);
+  const accSelect = useSelection(AccountsIds);
   const onDeselectAll = accSelect.handleDeselectAll;
   const onDeselectOne = accSelect.handleDeselectOne;
   const onSelectAll = accSelect.handleSelectAll;
@@ -238,6 +247,7 @@ const Accounts = () => {
     phoneNumber: "",
     photo: "",
     state: null,
+    studentId: ''
   };
 
   const fields = [
@@ -268,7 +278,7 @@ const Accounts = () => {
   const handleRemoveMany = async () => {
     const ids = []
     selected.forEach(element => {
-      const found = users.find(user => {return user.email === element})
+      const found = users.find(user => {return user._id === element})
       //console.log(found)
       ids.push(found._id)
       let id = found._id;
@@ -288,7 +298,7 @@ const Accounts = () => {
   const handleBanMany = async () => {
     const ids = []
     selected.forEach(email => {
-      const found = users.find(user => {return user.email === email})
+      const found = users.find(user => {return user._id === email})
       //console.log(found)
       ids.push(found.state)
       let state = found.state;
@@ -309,9 +319,12 @@ const Accounts = () => {
       
       axios.post(banUrl, curUser).then((res) => {
         if (res.status === HttpStatusCode.Ok)
-          toast.success((curUser.state === userStateEnum.banned ? 'Unbanned ' : 'Banned ') + curUser.email + ' successfully!')
+          toast.success((curUser.state === userStateEnum.banned ? 'Unbanned ' : 'Banned ') + (found.email ? found.email : found.studentId) + ' successfully!')
         else
           toast.error('Cannot ban!')
+      }).catch((e) => {
+        toast.error('Cannot ban! ' + e.message)
+  
       })
     });
     console.log(ids);
@@ -341,8 +354,26 @@ const Accounts = () => {
         toast.success((curUser.state === userStateEnum.banned ? 'Unbanned ' : 'Banned ') + curUser.email + ' successfully!')
       else
         toast.error('Cannot ban!')
+    }).catch((e) => {
+      toast.error('Cannot ban! ' + e.message)
+
     })
   };
+
+  const handleItemChange = (kw) => {
+    if (!kw) {
+      setRowsPerPage(5);
+      setPage(0)
+    }
+    else {
+    console.log(kw);
+    setRowsPerPage(1000);
+    setPage(0)
+    }
+    setSearchKeyword(kw);
+
+  };
+
 
   return (
     <>
@@ -381,7 +412,7 @@ const Accounts = () => {
                     >
                       Import
                     </Button>
-                    <Button
+                    {/* <Button
                       color="inherit"
                       startIcon={
                         <SvgIcon fontSize="small">
@@ -390,7 +421,7 @@ const Accounts = () => {
                       }
                     >
                       Export
-                    </Button>
+                    </Button> */}
                   </Stack>
                 </Stack>
                 {/* <div>
@@ -407,7 +438,7 @@ const Accounts = () => {
                 </div> */}
               </Stack>
               <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between">
-                <AccountsSearch />
+                <AccountsSearch handleItemChange={handleItemChange}/>
                 <Stack direction="row" spacing={1} paddingY='2%'>
                   <Button
                     startIcon={
@@ -440,13 +471,13 @@ const Accounts = () => {
                     variant="contained"
                     onClick={handleBanMany}
                   >
-                    Ban
+                    Ban/Unban
                   </Button>
 
                 </Stack>
               </Stack>
               <AccountsTable
-                count={users?.length}
+                count={!searchKeyword ? users?.length : acc?.length}
                 items={acc}
                 accId={AccountsIds}
                 accEmail={AccountsEmails}

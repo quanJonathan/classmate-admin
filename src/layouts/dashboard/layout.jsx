@@ -33,9 +33,9 @@ const Layout = () => {
     }
   }, [openNav]);
 
-  useEffect(() => {
-    handlePathnameChange();
-  }, [location.pathname, handlePathnameChange]);
+  // useEffect(() => {
+  //   handlePathnameChange();
+  // }, [location.pathname, handlePathnameChange]);
 
   return (
     <>
