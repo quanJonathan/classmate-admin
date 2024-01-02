@@ -25,7 +25,7 @@ export const ClassPeople = (props) => {
     <Card>
       <Container style={{ marginTop: 20 }}>
         <Section title="Teachers" data={teachers} icon={<PersonIcon />} selectAll={selectAll} />
-        <Section title="Students" data={students} icon={<MoreIcon />} selectAll={selectAll} />
+        <Section title="Students" data={students} icon={<PersonIcon />} selectAll={selectAll} />
       </Container>
     </Card>
   );

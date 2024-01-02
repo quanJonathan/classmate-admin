@@ -3,6 +3,11 @@ import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIc
 import ClockIcon from "@heroicons/react/24/solid/ClockIcon";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CheckIcon from "@heroicons/react/24/solid/CheckCircleIcon";
+import XMarkIcon from "@heroicons/react/24/solid/XMarkIcon";
+import { toast } from "react-toastify";
+import axios, { HttpStatusCode } from "axios";
+
 import {
   Avatar,
   Box,
@@ -15,9 +20,11 @@ import {
   Stack,
   SvgIcon,
   Typography,
+  Button
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { TimeIcon } from "@mui/x-date-pickers";
 
 export const ClassCard = (props) => {
   const { classObject } = props;
@@ -83,6 +90,21 @@ export const ClassCard = (props) => {
     };
   }
 
+  const handleBan = async (name, id, state) => {
+    let curUser = {
+      classId: id, 
+      state: state == "active" ? "inactive" : "active"
+    };
+    console.log('Form submitted:', curUser);
+    
+    await axios.post("http://localhost:3001/class/updateState", curUser).then((res) => {
+        toast.success((state == "inactive" ? 'Activate ' : 'Inactivate ') + "class " + name + ' successfully!')
+    }).catch((e) => {
+      toast.error('Cannot ban! ' + e.message)
+
+    })
+  };
+
   return (
     <div onContextMenu={handleContextMenu} style={{ cursor: "context-menu" }}>
       <Card
@@ -90,7 +112,7 @@ export const ClassCard = (props) => {
           display: "flex",
           flexDirection: "column",
           height: "100%",
-          bgcolor: stringToColor(classObject?.className)
+          bgcolor: classObject?.state == 'active' ? stringToColor(classObject?.className) : 'grey'
         }}
       >
         <Box
@@ -99,12 +121,22 @@ export const ClassCard = (props) => {
             justifyContent: "flex-end",
             pr: 1,
             pt: 1,
-            bgcolor: 'white',
+            bgcolor: classObject?.state == 'active' ? 'white' : 'grey',
             margin: '3% 2.5% 0px 2.5%',
-            borderTopLeftRadius: '10px' ,
-            borderTopRightRadius: '10px' 
+            borderTopLeftRadius: '10px',
+            borderTopRightRadius: '10px'
           }}
         >
+          <Button
+            id={classObject._id}
+            color="inherit"
+            startIcon={
+              <SvgIcon fontSize="small">
+                {classObject.state === 'active' ? <CheckIcon /> : <XMarkIcon />}
+              </SvgIcon>
+            }
+            onClick={() => handleBan(classObject.className, classObject.classId, classObject.state)}
+          ></Button>
           <IconButton onClick={handleViewDetail} size="small">
             <EditIcon fontSize="small" />
           </IconButton>
@@ -112,7 +144,7 @@ export const ClassCard = (props) => {
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Box>
-        <CardContent sx={{width: '95%', alignSelf: 'center', bgcolor: 'white'}}>
+        <CardContent sx={{ width: '95%', alignSelf: 'center', bgcolor: classObject?.state == 'active' ? 'white' : 'grey' }}>
           <Box
             sx={{
               display: "flex",
@@ -123,7 +155,7 @@ export const ClassCard = (props) => {
             <Avatar src="" variant="square" />
           </Box>
           <Typography align="center" gutterBottom variant="h5">
-            {classObject?.className}
+            {classObject?.className + (classObject?.state == 'inactive' ? " (INACTIVE)" : "")}
           </Typography>
           <Typography align="center" variant="body1">
             {classObject?.classId}
@@ -136,8 +168,10 @@ export const ClassCard = (props) => {
           direction="row"
           justifyContent="space-between"
           spacing={2}
-          sx={{ p: 2, bgcolor: 'white', width: '95%', alignSelf: 'center', marginBottom: '3%', 
-          borderBottomLeftRadius: '10px' , borderBottomRightRadius: '10px' }}
+          sx={{
+            p: 2, bgcolor: classObject?.state == 'active' ? 'white' : 'grey', width: '95%', alignSelf: 'center', marginBottom: '3%',
+            borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px'
+          }}
         >
           <Stack alignItems="center" direction="row" spacing={1}>
             <SvgIcon color="action" fontSize="small">
