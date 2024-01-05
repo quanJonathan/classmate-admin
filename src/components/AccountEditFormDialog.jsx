@@ -73,7 +73,8 @@ const AccountEditFormDialog = ({ id, fields, defaultValue, isOpen, postUrl, titl
         }
       })
       .catch((e) => {
-        toast.error(e)
+        toast.error("Cannot edit!" + formData?.email)
+        console.log(e)
       });
     handleCloseFull();
   };

@@ -21,6 +21,7 @@ import Grid from '@mui/material/Grid'; // Grid version 1
 import AccountFormDialog from "../components/AccountFormDialog";
 import { userStateEnum } from "../sections/customer/userState.enum";
 import { trackPromise, usePromiseTracker } from "react-promise-tracker";
+import ExcelUploadButton from "../components/UploadExcelButton";
 
 const LoadingIndicator = props => {
   const { promiseInProgress } = usePromiseTracker();
@@ -374,6 +375,52 @@ const Accounts = () => {
 
   };
 
+  const handleUpload = async (data) => {
+    // Handle the uploaded data as needed
+    // console.log("Uploaded Excel Data:", data);
+    if (!data) {
+      console.log("wrong")
+      toast.error("Wrong file format")
+      return;
+    }
+    data.forEach((row, rowIndex) => {
+      console.log(row)
+      if (row != null && rowIndex > 1) {
+        let formData = {
+          firstName: "",
+          lastName: "",
+          email: row[1],
+          password: "",
+          roles: "",
+          provider: "",
+          address: "",
+          phoneNumber: "",
+          photo: "",
+          state: null,
+          studentId: row[2]
+        };
+        console.log(row[2])
+        axios.post("http://localhost:3001/user/mapIdWithEmail", formData)
+        .then((res) => {
+          console.log(res)
+          if (res.status === HttpStatusCode.Ok)
+            toast.success('Map successfully: ' + row[1] + " to " + row[2]);
+          else {
+            toast.error('Error')
+          }
+        })
+        .catch((e) => {
+          toast.error('Map unsucessfully: ' + row[1] + " to " + row[2])
+        });
+      }
+    });
+
+    // console.log("adding");
+    // console.log(students);
+
+    
+  };
+
 
   return (
     <>
@@ -402,16 +449,8 @@ const Accounts = () => {
                 <Stack spacing={1}>
                   <Typography variant="h4">Accounts</Typography>
                   <Stack alignItems="center" direction="row" spacing={1}>
-                    <Button
-                      color="inherit"
-                      startIcon={
-                        <SvgIcon fontSize="small">
-                          <ArrowUpOnSquareIcon />
-                        </SvgIcon>
-                      }
-                    >
-                      Import
-                    </Button>
+                    <ExcelUploadButton onUpload={handleUpload}></ExcelUploadButton>
+                    
                     {/* <Button
                       color="inherit"
                       startIcon={
