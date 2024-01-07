@@ -21,11 +21,11 @@ export const AuthProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
-  //useEffect(() => {
-    // if(!token){
-    //   navigate('/auth/login', {replace: true})
-    // }
-  //},[])
+  useEffect(() => {
+    if(!token){
+      navigate('/auth/login', {replace: true})
+    }
+  },[])
 
   useEffect(() => {
     // Check if the token is expired or not present

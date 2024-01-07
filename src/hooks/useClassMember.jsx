@@ -8,7 +8,7 @@ export function useClassMember () {
   const {id} = useParams()
   const { data, error, isLoading } = useSWR(`http://localhost:3001/class/getClassMember/${id}`, fetcher)
  
-  return {
+  return {  
     students: data?.filter(member => member.classes.some(cls => cls.classId.classId === id && cls.role === '1000')),
     teachers: data?.filter(member => member.classes.some(cls => cls.classId.classId === id && cls.role === '3000')),
     isLoading,
