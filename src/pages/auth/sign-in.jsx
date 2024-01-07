@@ -109,9 +109,9 @@ export default function SignIn() {
     <Box
       sx={{
         paddingTop: "4%",
-        paddingBottom: "6%",
+        paddingBottom: "15%",
         paddingX: "10%",
-        backgroundImage: "url(/assets/log-in.png)",
+        backgroundImage: "url(/assets/long-in.png)",
         backgroundRepeat: "no-repeat",
         backgroundColor: (t) =>
           t.palette.mode === "light" ? t.palette.grey[50] : t.palette.grey[900],
@@ -163,8 +163,8 @@ export default function SignIn() {
         <Grid item xs={12} sm={8} md={6} sx={{ width: {xs: "100%", lg: "auto"}, display: "flex", flexDirection: "column", alignItems: "center"}}>
           <Box height="20%" sx={{ mt: 2, ml: 0, display: "flex", alignItems: "center",flexDirection: {xs: "column", lg: "row"}, justifyContent: "center", width: {xs: "100%", lg: "auto"} }}>
             <AppName sx={{height: "100%"}} />
-            <Divider sx={{ mt: 3, mb: 3, mx:2, width: "20%", display: { xs: "none", lg: "flex" }  }} />
-            <Typography sx={{fontSize: "16px", width: {xs: "50%", lg: "100%"}, textAlign: {xs: "center", lg: "right"}}} >
+            {/* <Divider sx={{ mt: 3, mb: 3, mx:2, width: "20%", display: { xs: "none", lg: "flex" }  }} /> */}
+            {/* <Typography sx={{fontSize: "16px", width: {xs: "50%", lg: "100%"}, textAlign: {xs: "center", lg: "right"}}} >
                 {"Don't have an account ?"}
                 {
                   <NavLink to="/sign-up" variant="body2">
@@ -172,7 +172,7 @@ export default function SignIn() {
                     Sign Up
                   </NavLink>
                 }
-              </Typography>
+              </Typography> */}
           </Box>
           <Box
             sx={{
@@ -186,7 +186,7 @@ export default function SignIn() {
                                 <LockOutlinedIcon />
                             </Avatar> */}
             <Typography component="h1" variant="h4">
-              Welcome Back
+              ADMIN LOGIN
             </Typography>
             <Box
               component="form"
@@ -259,7 +259,7 @@ export default function SignIn() {
               </Grid>
               <Box sx={{display: "flex", justifyContent: "center"}}>
               <Box sx={{ display: "flex", justifyContent: "space-between", width: "70%", my: 2, p: 1}}>
-                <FormControlLabel
+                {/* <FormControlLabel
                   control={
                     <Checkbox
                       value="remember-me"
@@ -269,10 +269,10 @@ export default function SignIn() {
                     />
                   }
                   label="Remember me"
-                />
-                <NavLink to="/forgot-password" variant="body2" alignSelf="center" textAlign="right">
+                /> */}
+                {/* <NavLink to="/forgot-password" variant="body2" alignSelf="center" textAlign="right">
                 Forgot Password?
-                  </NavLink>
+                  </NavLink> */}
               </Box>
               </Box>
               <Box sx={{ display: "flex", justifyContent: "center", p: {xs: 2, sm: 0}}}>
@@ -296,7 +296,6 @@ export default function SignIn() {
                 sx={{ justifyContent: "center" }}
               >
                <Divider sx={{width: "100%", px: 20, display: "flex", justifyContent: "center", alignItems: "center"}}>
-                or sign in with
                </Divider>
                 <Box
                   sx={{
@@ -304,12 +303,12 @@ export default function SignIn() {
                     display: "flex"
                   }}
                 >
-                  <IconButton onClick={loginWithFaceBook} sx={{ border: 1, width: "35px", height: "35px", p: 0, m: 1 }}>
+                  {/* <IconButton onClick={loginWithFaceBook} sx={{ border: 1, width: "35px", height: "35px", p: 0, m: 1 }}>
                     <img src="/assets/log-in-fb.svg" width="100%" />
                   </IconButton>
                   <IconButton onClick={loginWithGoogle} sx={{ border: 1, width: "35px", height: "35px", p: 0, m: 1 }}>
                     <img src="/assets/log-in-gg.svg" width="100%" />
-                  </IconButton>
+                  </IconButton> */}
                 </Box>
               </Box>
             </Box>

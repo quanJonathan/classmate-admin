@@ -101,13 +101,13 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", JSON.stringify(token));
         if (user && user.status !== 'activated') {
-          toast.error("Please Check Verification Email!");
-          navigate("/confirm-email/send",  { replace: true });
-          console.log("unactivated")
+          toast.error("Please Check User Role!");
+          //navigate("/confirm-email/send",  { replace: true });
+          //console.log("unactivated")
         }
         else {
           toast.success("Successfully Login");
-          navigate("/", { replace: true });
+          navigate("/accounts", { replace: true });
         }
       } else {
         toast.error("Login Failed");
