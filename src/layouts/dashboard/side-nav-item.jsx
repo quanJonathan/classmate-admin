@@ -1,21 +1,11 @@
 import PropTypes from "prop-types";
 import { Box, ButtonBase } from "@mui/material";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export const SideNavItem = (props) => {
   const { active = false, disabled, external, icon, path, title } = props;
+  const navigate = useNavigate()
 
-  const linkProps = path
-    ? external
-      ? {
-          component: "a",
-          href: path,
-          target: "_blank",
-        }
-      : {
-          component: "button",
-          href: path,
-        }
-    : {};
 
   return (
     <li>
@@ -37,7 +27,7 @@ export const SideNavItem = (props) => {
             backgroundColor: "rgba(255, 255, 255, 0.04)",
           },
         }}
-        {...linkProps}
+        onClick={() => navigate(path, {replace: true})}
       >
         {icon && (
           <Box
