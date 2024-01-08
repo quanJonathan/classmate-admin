@@ -12,7 +12,6 @@ import Index from "./pages";
 import SignIn from "./pages/auth/sign-in";
 import Error from "./pages/404";
 import Classes from "./pages/classes";
-import Settings from "./pages/settings";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import { createTheme } from "./theme";
@@ -71,7 +70,6 @@ export const router = createBrowserRouter(
         <Route path="/classes" element={<Classes/>}/>
         <Route path="/classes/edit/:id" element={<ClassEdit/>} />
         <Route path="/accounts" element={<Accounts />} />
-        <Route path="/settings" element={<Settings />} />
       </Route>
 
       <Route path="/auth">

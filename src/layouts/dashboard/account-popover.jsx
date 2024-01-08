@@ -2,18 +2,17 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom'; // Use react-router-dom's useNavigate instead of next/navigation
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 
 export const AccountPopover = (props) => {
   const { anchorEl, onClose, open } = props;
   const navigate = useNavigate();
-  const auth = useAuth();
+  const {user, logout} = useAuth();
 
   const handleSignOut = useCallback(() => {
     onClose?.();
-    auth.signOut();
-    navigate.push('/auth/login');
-  }, [onClose, auth, navigate]);
+    logout()
+  }, [onClose, user?._id, navigate]);
 
   return (
     <Popover
@@ -39,7 +38,7 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          Anika Visser
+          {user?.firstName} {user?.lastName}
         </Typography>
       </Box>
       <Divider />
