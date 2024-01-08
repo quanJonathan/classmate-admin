@@ -85,7 +85,7 @@ const Page = () => {
   }, []);
 
 
-  const submitUrl = "http://localhost:3001/class/addClass";
+  const submitUrl = "https://classmatebe-final.onrender.com/class/addClass";
 
   const defaultValue = {
     className: "",

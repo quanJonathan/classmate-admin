@@ -97,7 +97,7 @@ export const ClassCard = (props) => {
     };
     console.log('Form submitted:', curUser);
     
-    await axios.post("http://localhost:3001/class/updateState", curUser).then((res) => {
+    await axios.post("https://classmatebe-final.onrender.com/class/updateState", curUser).then((res) => {
         toast.success((state == "inactive" ? 'Activate ' : 'Inactivate ') + "class " + name + ' successfully!')
     }).catch((e) => {
       toast.error('Cannot ban! ' + e.message)

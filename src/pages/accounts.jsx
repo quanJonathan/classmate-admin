@@ -233,9 +233,9 @@ const Accounts = () => {
   //console.log(isLoading);
   //console.log(AccountsIds);
 
-  const submitUrl = "http://localhost:3001/user/addAccount";
-  const banUrl = "http://localhost:3001/user/ban";
-  const removeUrl = "http://localhost:3001/user/remove";
+  const submitUrl = "https://classmatebe-final.onrender.com/user/addAccount";
+  const banUrl = "https://classmatebe-final.onrender.com/user/ban";
+  const removeUrl = "https://classmatebe-final.onrender.com/user/remove";
 
   const defaultValue = {
     firstName: "",
@@ -400,7 +400,7 @@ const Accounts = () => {
           studentId: row[2]
         };
         console.log(row[2])
-        axios.post("http://localhost:3001/user/mapIdWithEmail", formData)
+        axios.post("https://classmatebe-final.onrender.com/user/mapIdWithEmail", formData)
         .then((res) => {
           console.log(res)
           if (res.status === HttpStatusCode.Ok)

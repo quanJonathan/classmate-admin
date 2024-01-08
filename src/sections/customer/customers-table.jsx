@@ -88,7 +88,7 @@ export const CustomersTable = (props) => {
   const selectedSome = (selected?.length > 0) && (selected?.length < items?.length);
   const selectedAll = (items?.length > 0) && (selected?.length === items?.length);
 
-  const editUrl = "http://localhost:3001/user/update";
+  const editUrl = "https://classmatebe-final.onrender.com/user/update";
 
   let defaultValue = {
     firstName: "",

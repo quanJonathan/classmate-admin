@@ -6,7 +6,7 @@ import useSWR from "swr"
 export function useClassMember () {
   const fetcher = (url) => axios.get(url).then((res) => res.data);
   const {id} = useParams()
-  const { data, error, isLoading } = useSWR(`http://localhost:3001/class/getClassMember/${id}`, fetcher)
+  const { data, error, isLoading } = useSWR(`https://classmatebe-final.onrender.com/class/getClassMember/${id}`, fetcher)
  
   return {  
     students: data?.filter(member => member.classes.some(cls => cls.classId.classId === id && cls.role === '1000')),

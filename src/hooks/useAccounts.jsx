@@ -3,7 +3,7 @@ import useSWR from "swr";
 
 export function useUsers () {
   const fetcher = (url) => axios.get(url).then((res) => res.data);
-  const { data, error, isLoading } = useSWR("http://localhost:3001/user/all", fetcher);
+  const { data, error, isLoading } = useSWR("https://classmatebe-final.onrender.com/user/all", fetcher);
   
   console.log(data)
   return {
